@@ -15,7 +15,7 @@ class OpenAIBackend(BaseLLMBackend):
     ) -> Generator[str, None, None]:
         try:
             stream = self.client.chat.completions.create(
-                model="gpt-4o",
+                model="gpt-4o-mini",
                 messages=messages,
                 stream=True,
                 **kwargs
