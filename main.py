@@ -1,5 +1,5 @@
 import json
-from fastapi import FastAPI, UploadFile, File, Form, HTTPException
+from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.responses import StreamingResponse
 from typing import Optional
 from ai_agent.ai_agent import call_agent
