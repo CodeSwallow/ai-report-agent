@@ -23,6 +23,7 @@ def call_agent(
     additional_info: Optional[str] = None
 ) -> Generator[str, None, None]:
     prompt = build_prompt(tone, template, additional_info)
+    print(f"Generated Prompt:\n{prompt}")
 
     messages = [
         {"role": "system", "content": prompt},
