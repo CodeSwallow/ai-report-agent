@@ -34,26 +34,32 @@ def call_agent(
 
     try:
         for text_content in backend.generate_stream(messages):
-            json_chunk = json.dumps({"content": text_content})
+            json_chunk = json.dumps({
+                "role": "assistant",
+                "content": text_content
+            })
             yield json_chunk + "\n"
     except ConnectionError as e:
         error_response = json.dumps({
             "error": True,
             "code": 502,
-            "message": str(e)
+            "message": str(e),
+            "content": "An error occurred, please try again later."
         })
         yield error_response + "\n"
     except ValueError as e:
         error_response = json.dumps({
             "error": True,
             "code": 400,
-            "message": str(e)
+            "message": str(e),
+            "content": "An error occurred, please try again later."
         })
         yield error_response + "\n"
     except Exception as e:
         error_response = json.dumps({
             "error": True,
             "code": 500,
-            "message": "An unexpected error occurred."
+            "message": "An unexpected error occurred.",
+            "content": "An error occurred, please try again later."
         })
         yield error_response + "\n"

@@ -3,9 +3,8 @@ from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.responses import StreamingResponse
 from typing import Optional
 from ai_agent.ai_agent import call_agent
-from utils.pdf_utils import extract_text_from_pdf
-from utils.docx_utils import extract_text_from_docx
-from utils.txt_utils import extract_text_from_txt
+from utils import extract_text_from_pdf, extract_text_from_docx, extract_text_from_txt
+from services.word_limit.word_limit_checker_factory import WordLimitCheckerFactory
 
 app = FastAPI()
 
@@ -15,6 +14,7 @@ async def summarize(
     document: UploadFile = File(...),
     tone: str = Form(...),
     template: str = Form(...),
+    user_type: str = Form(...),
     additional_info: Optional[str] = Form(None)
 ):
     """
@@ -44,8 +44,24 @@ async def summarize(
         error_response = {
             "error": True,
             "code": 400,
-            "message": "Invalid file type. Only PDF, DOCX, and TXT are accepted."
+            "message": "Invalid file type. Only PDF, DOCX, and TXT are accepted.",
+            "content": "Please upload a valid PDF, DOCX, or TXT file."
         }
+        return StreamingResponse(
+            (json.dumps(error_response) + "\n" for _ in range(1)),
+            media_type="application/x-ndjson",
+            status_code=400
+        )
+
+    word_limit_checker = WordLimitCheckerFactory.get_checker(user_type)
+    if not word_limit_checker.check_word_limit(text_content):
+        error_response = {
+            "error": True,
+            "code": 400,
+            "message": "Document exceeds the word limit for free users.",
+            "content": "Please upgrade to a pro account to access unlimited word limits."
+        }
+        print(f"Error: {error_response['message']}"),
         return StreamingResponse(
             (json.dumps(error_response) + "\n" for _ in range(1)),
             media_type="application/x-ndjson",
