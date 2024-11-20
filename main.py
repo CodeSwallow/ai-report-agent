@@ -4,6 +4,8 @@ from fastapi.responses import StreamingResponse
 from typing import Optional
 from ai_agent.ai_agent import call_agent
 from utils.pdf_utils import extract_text_from_pdf
+from utils.docx_utils import extract_text_from_docx
+from utils.txt_utils import extract_text_from_txt
 
 app = FastAPI()
 
