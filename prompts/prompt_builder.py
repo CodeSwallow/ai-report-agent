@@ -30,6 +30,20 @@ TEMPLATE_DESCRIPTIONS = {
 
 
 def build_prompt(tone: str, template: str, additional_info: Optional[str] = None) -> str:
+    """
+    Builds a prompt for document summarization based on specified tone, template, and additional information.
+
+    This function constructs a structured prompt that guides an AI model in summarizing documents
+    according to the given tone and template. It also incorporates any additional information provided.
+
+    Parameters:
+    tone (str): The desired tone for the summary. Should be a key from the TONE_DESCRIPTIONS dictionary.
+    template (str): The desired template for the summary structure. Should be a key from the TEMPLATE_DESCRIPTIONS dictionary.
+    additional_info (Optional[str]): Any additional information or instructions to be included in the prompt. Defaults to None.
+
+    Returns:
+    str: A formatted prompt string that includes guidelines for tone, template, and general summarization instructions.
+    """
     tone_description = TONE_DESCRIPTIONS.get(tone, "Use a neutral tone.")
     template_description = TEMPLATE_DESCRIPTIONS.get(template, "Provide a general summary.")
 
