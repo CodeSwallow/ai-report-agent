@@ -1,22 +1,21 @@
-from ai_agent.base_llm_backend import BaseLLMBackend
-import openai
 import weave
+import openai
 from openai import OpenAI
 from typing import Generator, List, Dict
 
+client = OpenAI()
 
-@weave.op()
-class OpenAIBackend(BaseLLMBackend):
-    def __init__(self):
-        self.client = OpenAI()
 
-    def generate_stream(
+class OpenAIBackend(weave.Model):
+
+    @weave.op()
+    def predict(
         self,
         messages: List[Dict[str, str]],
         **kwargs
     ) -> Generator[str, None, None]:
         try:
-            stream = self.client.chat.completions.create(
+            stream = client.chat.completions.create(
                 model="gpt-4o-mini",
                 messages=messages,
                 stream=True,

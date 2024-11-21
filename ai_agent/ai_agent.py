@@ -1,4 +1,5 @@
 import json
+import weave
 from typing import Generator, Optional
 from prompts.prompt_builder import build_prompt
 from config import BACKEND_PROVIDER
@@ -7,7 +8,7 @@ from ai_agent.cerebras_backend import CerebrasBackend
 from ai_agent.openai_backend import OpenAIBackend
 
 
-def get_backend() -> BaseLLMBackend:
+def get_backend() -> weave.Model:
     if BACKEND_PROVIDER == "cerebras":
         return CerebrasBackend()
     elif BACKEND_PROVIDER == "openai":
@@ -23,7 +24,6 @@ def call_agent(
     additional_info: Optional[str] = None
 ) -> Generator[str, None, None]:
     prompt = build_prompt(tone, template, additional_info)
-    print(f"Generated Prompt:\n{prompt}")
 
     messages = [
         {"role": "system", "content": prompt},
@@ -33,12 +33,19 @@ def call_agent(
     backend = get_backend()
 
     try:
-        for text_content in backend.generate_stream(messages):
-            json_chunk = json.dumps({
-                "role": "assistant",
-                "content": text_content
-            })
-            yield json_chunk + "\n"
+        with weave.attributes({
+            'user_id': 'isai',
+            'env': 'development',
+            'tone': tone,
+            'template': template,
+            'additional_info': additional_info
+        }):
+            for text_content in backend.predict(messages):
+                json_chunk = json.dumps({
+                    "role": "assistant",
+                    "content": text_content
+                })
+                yield json_chunk + "\n"
     except ConnectionError as e:
         error_response = json.dumps({
             "error": True,

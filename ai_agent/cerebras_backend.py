@@ -1,31 +1,28 @@
-from ai_agent.base_llm_backend import BaseLLMBackend
 import weave
 from cerebras.cloud.sdk import Cerebras
 from cerebras.cloud.sdk import APIConnectionError, RateLimitError, APIStatusError
 from typing import Generator, List, Dict
 
+client = Cerebras()
 
-@weave.op()
-class CerebrasBackend(BaseLLMBackend):
-    def __init__(self):
-        self.client = Cerebras()
+class CerebrasBackend(weave.Model):
 
-    def generate_stream(
+    @weave.op()
+    def predict(
         self,
         messages: List[Dict[str, str]],
         **kwargs
     ) -> Generator[str, None, None]:
         try:
-            stream = self.client.chat.completions.create(
+            stream = client.chat.completions.create(
                 messages=messages,
                 model="llama3.1-8b",
                 stream=True,
                 **kwargs
             )
             for chunk in stream:
-                text_content = chunk.choices[0].delta.content
-                if text_content is not None:
-                    yield text_content
+                if chunk.choices[0].delta.content is not None:
+                    yield chunk.choices[0].delta.content
         except APIConnectionError:
             raise ConnectionError("The Cerebras server could not be reached.")
         except RateLimitError:
