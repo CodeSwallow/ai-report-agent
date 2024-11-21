@@ -1,4 +1,5 @@
 import json
+import weave
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.responses import StreamingResponse
 from typing import Optional
@@ -7,6 +8,8 @@ from utils import extract_text_from_pdf, extract_text_from_docx, extract_text_fr
 from services.word_limit.word_limit_checker_factory import WordLimitCheckerFactory
 
 app = FastAPI()
+
+weave.init('summarizer-agent')
 
 
 @app.post("/summarize")

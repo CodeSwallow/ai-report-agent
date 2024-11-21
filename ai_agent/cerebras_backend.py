@@ -1,9 +1,11 @@
 from ai_agent.base_llm_backend import BaseLLMBackend
+import weave
 from cerebras.cloud.sdk import Cerebras
 from cerebras.cloud.sdk import APIConnectionError, RateLimitError, APIStatusError
 from typing import Generator, List, Dict
 
 
+@weave.op()
 class CerebrasBackend(BaseLLMBackend):
     def __init__(self):
         self.client = Cerebras()

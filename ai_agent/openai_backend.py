@@ -1,9 +1,11 @@
 from ai_agent.base_llm_backend import BaseLLMBackend
 import openai
+import weave
 from openai import OpenAI
 from typing import Generator, List, Dict
 
 
+@weave.op()
 class OpenAIBackend(BaseLLMBackend):
     def __init__(self):
         self.client = OpenAI()
