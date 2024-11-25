@@ -3,7 +3,6 @@ import weave
 from typing import Generator, Optional
 from prompts.prompt_builder import build_prompt
 from config import BACKEND_PROVIDER
-from ai_agent.base_llm_backend import BaseLLMBackend
 from ai_agent.cerebras_backend import CerebrasBackend
 from ai_agent.openai_backend import OpenAIBackend
 
