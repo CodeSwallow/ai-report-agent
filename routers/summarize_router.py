@@ -7,7 +7,7 @@ from middleware.rate_limiter import limiter
 router = APIRouter()
 
 @router.post("/summarize")
-@limiter.limit("15/minute")
+@limiter.limit("5/minute")
 async def summarize(
     request: Request,
     document: UploadFile = Form(...),
