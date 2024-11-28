@@ -1,3 +1,7 @@
+import json
+import weave
+
+from exceptions.summarization_exceptions import WordLimitExceededError
 from utils.file_extraction import validate_file_type, extract_text
 from utils.ip_validation import validate_ip
 from ai_agent.ai_agent import call_agent
@@ -11,8 +15,9 @@ async def process_summarization(
     template,
     user_type,
     ip_address,
-    additional_info
-):
+    additional_info,
+    language
+) -> StreamingResponse:
     validate_ip(ip_address)
 
     file_type = validate_file_type(document.content_type)
@@ -20,16 +25,26 @@ async def process_summarization(
 
     word_limit_checker = WordLimitCheckerFactory.get_checker(user_type)
     if not word_limit_checker.check_word_limit(text_content):
-        raise ValueError("Document exceeds the word limit for free users. Upgrade to pro.")
+        raise WordLimitExceededError()
 
-    def stream_response():
-        for json_chunk in call_agent(
-            content=text_content,
-            tone=tone,
-            template=template,
-            additional_info=additional_info
-        ):
-            yield json_chunk
+    async def stream_response():
+        with weave.attributes({
+            'user_id': user_type,
+            'env': 'development',
+            'tone': tone,
+            'template': template,
+            'ip_address': ip_address,
+            'additional_info': additional_info,
+            'language': language
+        }):
+            for json_chunk in call_agent(
+                    content=text_content,
+                    tone=tone,
+                    template=template,
+                    additional_info=additional_info,
+                    language=language
+            ):
+                yield json_chunk
 
     return StreamingResponse(
         stream_response(),

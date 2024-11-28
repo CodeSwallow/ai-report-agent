@@ -20,9 +20,10 @@ def call_agent(
     content: str,
     tone: str,
     template: str,
-    additional_info: Optional[str] = None
+    additional_info: Optional[str] = None,
+    language: str = "en"
 ) -> Generator[str, None, None]:
-    prompt = build_prompt(tone, template, additional_info)
+    prompt = build_prompt(tone, template, additional_info, language)
 
     messages = [
         {"role": "system", "content": prompt},
@@ -31,41 +32,9 @@ def call_agent(
 
     backend = get_backend()
 
-    try:
-        with weave.attributes({
-            'user_id': 'isai',
-            'env': 'development',
-            'tone': tone,
-            'template': template,
-            'additional_info': additional_info
-        }):
-            for text_content in backend.predict(messages):
-                json_chunk = json.dumps({
-                    "role": "assistant",
-                    "content": text_content
-                })
-                yield json_chunk + "\n"
-    except ConnectionError as e:
-        error_response = {
-            "error": True,
-            "code": 502,
-            "message": str(e),
-            "content": "An error occurred, please try again later."
-        }
-        yield error_response
-    except ValueError as e:
-        error_response = {
-            "error": True,
-            "code": 400,
-            "message": str(e),
-            "content": "An error occurred, please try again later."
-        }
-        yield error_response
-    except Exception as e:
-        error_response = {
-            "error": True,
-            "code": 500,
-            "message": "An unexpected error occurred.",
-            "content": "An error occurred, please try again later."
-        }
-        yield error_response
+    for text_content in backend.predict(messages):
+        json_chunk = json.dumps({
+            "role": "assistant",
+            "content": text_content
+        })
+        yield json_chunk + "\n"

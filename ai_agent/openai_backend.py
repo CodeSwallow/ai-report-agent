@@ -1,10 +1,10 @@
 import weave
 import openai
 from openai import OpenAI
+from exceptions.backend_exceptions import APIConnectionError, APIRateLimitError, APIStatusError
 from typing import Generator, List, Dict
 
 client = OpenAI()
-
 
 class OpenAIBackend(weave.Model):
 
@@ -22,11 +22,12 @@ class OpenAIBackend(weave.Model):
                 **kwargs
             )
             for chunk in stream:
-                if chunk.choices[0].delta.content is not None:
-                    yield chunk.choices[0].delta.content
+                if chunk.choices:
+                    if chunk.choices[0].delta.content:
+                        yield chunk.choices[0].delta.content
         except openai.APIConnectionError:
-            raise ConnectionError("The OpenAI server could not be reached.")
+            raise APIConnectionError("The OpenAI server could not be reached.")
         except openai.RateLimitError:
-            raise ValueError("Rate limit exceeded for OpenAI API.")
+            raise APIRateLimitError("Rate limit exceeded for OpenAI API.")
         except openai.OpenAIError as e:
-            raise ValueError(f"OpenAI API Error: {e}")
+            raise APIStatusError(f"OpenAI API Error: {e}")

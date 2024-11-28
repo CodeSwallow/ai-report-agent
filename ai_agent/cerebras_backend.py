@@ -1,6 +1,7 @@
 import weave
 from cerebras.cloud.sdk import Cerebras
-from cerebras.cloud.sdk import APIConnectionError, RateLimitError, APIStatusError
+from cerebras.cloud.sdk import APIConnectionError as CerebrasAPIConnectionError, RateLimitError as CerebrasRateLimitError, APIStatusError as CerebrasAPIStatusError
+from exceptions.backend_exceptions import APIConnectionError, APIRateLimitError, APIStatusError
 from typing import Generator, List, Dict
 
 client = Cerebras()
@@ -23,9 +24,9 @@ class CerebrasBackend(weave.Model):
             for chunk in stream:
                 if chunk.choices[0].delta.content is not None:
                     yield chunk.choices[0].delta.content
-        except APIConnectionError:
-            raise ConnectionError("The Cerebras server could not be reached.")
-        except RateLimitError:
-            raise ValueError("Rate limit exceeded for Cerebras API.")
-        except APIStatusError as e:
-            raise ValueError(f"Cerebras API Error: {e.message}")
+        except CerebrasAPIConnectionError:
+            raise APIConnectionError("The Cerebras server could not be reached.")
+        except CerebrasRateLimitError:
+            raise APIRateLimitError("Rate limit exceeded for Cerebras API.")
+        except CerebrasAPIStatusError as e:
+            raise APIStatusError(f"Cerebras API Error: {e.message}")

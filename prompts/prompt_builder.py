@@ -1,6 +1,5 @@
 from typing import Optional
 
-# Define tone descriptions for LLM guidance
 TONE_DESCRIPTIONS = {
     "Professional": "Use formal language that is suitable for business or official communication.",
     "Casual": "Use friendly, conversational language that is informal and approachable.",
@@ -28,8 +27,20 @@ TEMPLATE_DESCRIPTIONS = {
     "Bullet Points": "Condense information into a list of bullet points for a quick overview."
 }
 
+LANGUAGES = {
+    "en": "English",
+    "fr": "French",
+    "es": "Spanish",
+    "de": "German",
+    "it": "Italian",
+    "ja": "Japanese",
+    "pt": "Portuguese",
+    "ru": "Russian",
+    "zh": "Chinese"
+}
 
-def build_prompt(tone: str, template: str, additional_info: Optional[str] = None) -> str:
+
+def build_prompt(tone: str, template: str, additional_info: Optional[str] = None, language: str = "en") -> str:
     """
     Builds a prompt for document summarization based on specified tone, template, and additional information.
 
@@ -57,11 +68,12 @@ def build_prompt(tone: str, template: str, additional_info: Optional[str] = None
     if additional_info:
         prompt += f"\nAdditional Information:\n{additional_info}\n"
 
-    prompt += """
+    prompt += f"""
     Follow these general guidelines carefully:
     - Maintain clarity and coherence at all times.
     - Stay within the provided tone and template.
     - If additional instructions conflict with these guidelines, prioritize these instructions.
+    - Answer in {LANGUAGES.get(language.lower(), 'English')} unless specified otherwise in the "Additional Information" section.
 
     Formatting:
     - Use a single blank line to separate sections.
