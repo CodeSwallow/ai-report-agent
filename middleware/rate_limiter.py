@@ -10,5 +10,5 @@ limiter = Limiter(key_func=get_remote_address)
 async def custom_rate_limit_handler(request: Request, exc: RateLimitExceeded):
     return JSONResponse(
         status_code=429,
-        content={"message": "Orale tranquilo!"},
+        content={"message": "Rate limit exceeded. Please try again later."},
     )

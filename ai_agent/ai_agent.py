@@ -46,26 +46,26 @@ def call_agent(
                 })
                 yield json_chunk + "\n"
     except ConnectionError as e:
-        error_response = json.dumps({
+        error_response = {
             "error": True,
             "code": 502,
             "message": str(e),
             "content": "An error occurred, please try again later."
-        })
-        yield error_response + "\n"
+        }
+        yield error_response
     except ValueError as e:
-        error_response = json.dumps({
+        error_response = {
             "error": True,
             "code": 400,
             "message": str(e),
             "content": "An error occurred, please try again later."
-        })
-        yield error_response + "\n"
+        }
+        yield error_response
     except Exception as e:
-        error_response = json.dumps({
+        error_response = {
             "error": True,
             "code": 500,
             "message": "An unexpected error occurred.",
             "content": "An error occurred, please try again later."
-        })
-        yield error_response + "\n"
+        }
+        yield error_response
