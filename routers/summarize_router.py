@@ -1,12 +1,15 @@
-from fastapi import APIRouter, UploadFile, Form, Depends
+from fastapi import APIRouter, UploadFile, Form, Request
 from typing import Optional
 from services.summarize_service import process_summarization
 from utils.response_helpers import create_error_response
+from middleware.rate_limiter import limiter
 
 router = APIRouter()
 
 @router.post("/summarize")
+@limiter.limit("2/minute")
 async def summarize(
+    request: Request,
     document: UploadFile = Form(...),
     tone: str = Form(...),
     template: str = Form(...),
