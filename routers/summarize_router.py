@@ -20,6 +20,8 @@ async def summarize(
     additional_info: Optional[str] = Form(None),
     language: str = Form("en")
 ) -> StreamingResponse:
+    request.state.language = language
+
     print(f"Received request: {request}")
     return await process_summarization(
         document=document,
